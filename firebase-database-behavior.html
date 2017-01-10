@@ -38,6 +38,15 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         },
 
         /**
+         * `pathReady` is true when `path` is a valid path
+         */
+        pathReady: {
+          value: Boolean,
+          notify: true,
+          computed: '__pathReady(path)'
+        },
+
+        /**
          * When true, Firebase listeners won't be activated. This can be useful
          * in situations where elements are loaded into the DOM before they're
          * ready to be activated (e.g. navigation, initialization scenarios).
@@ -53,7 +62,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       ],
 
       _setFirebaseValue: function(path, value) {
-        this._log('Setting Firebase value at', path, 'to', value)
+        this._log('Setting Firebase value at', path, 'to', value);
         var key = value && value.$key;
         var leaf = value && value.hasOwnProperty('$val');
         if (key) {
