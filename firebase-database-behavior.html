@@ -29,6 +29,25 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         },
 
         /**
+         * `defaultValue` the value to use if firebase does not 
+         */
+        defaultValue: {
+
+        },
+
+        /**
+         * `defaultValueType` the type to use for defaultValue
+         */
+        defaultValueType: {
+          type: String,
+          value: 'string'
+        },
+
+        __typedDefaultValue: {
+          computed: '__computeDefaultValue(defaultValue, defaultValueType)'
+        },
+
+        /**
          * Path to a Firebase root or endpoint. N.B. `path` is case sensitive.
          */
         path: {
@@ -64,6 +83,57 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           value.$key = key;
         }
         return result;
+      },
+
+      __computeDefaultValue: function(defaultValue, defaultValueType) {
+        this.__hasDefaultValue = true;
+        if(typeof defaultValueType === 'string' )  {
+          return this.__deserializeDefault(defaultValue, defaultValueType);
+        }
+        return defaultValue;
+      },
+
+      __deserializeDefault: function(value, type) {
+         type = type.toLowerCase();
+         switch (type) {
+            case 'number':
+              value = Number(value);
+              break;
+
+            case 'boolean':
+              value = (value !== null);
+              break;
+
+            case 'undefined':
+              value = (value === null || value === '') ?  undefined : value ;
+              break;
+
+            case 'object':
+              try {
+                value = JSON.parse(value);
+              } catch(x) {
+                // allow non-JSON literals like Strings and Numbers
+              }
+              break;
+
+            case 'array':
+              try {
+                value = JSON.parse(value);
+              } catch(x) {
+                value = null;
+                console.warn('Polymer::Attributes: couldn`t decode Array as JSON');
+              }
+              break;
+
+            case 'date':
+              value = new Date(value);
+              break;
+
+            case 'string':
+            default:
+              break;
+          }
+          return value;
       },
 
       __computeDb: function(app) {

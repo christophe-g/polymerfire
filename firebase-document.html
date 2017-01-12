@@ -59,7 +59,8 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
      * @override
      */
     get zeroValue() {
-      return {};
+      console.info('__hasDefaultValue', this.path, this.__typedDefaultValue);
+      return this.__hasDefaultValue ? this.__typedDefaultValue : {};
     },
 
     /**
