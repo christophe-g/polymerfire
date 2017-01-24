@@ -54,7 +54,16 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         disabled: {
           type: Boolean,
           value: false
-        }
+        },
+
+        /**
+         * `exists` is set to `true` when the data actually exists for the specified path; `false` otherwise. 
+         * When the path is changed, this property is set to `null`
+         */
+         exists: {
+          type: Boolean,
+          notify: true
+         }
       },
 
       observers: [
@@ -101,6 +110,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       __pathChanged: function(path, oldPath) {
         if (!this.disabled && !this.valueIsEmpty(this.data)) {
           this.syncToMemory(function() {
+            this.exists = null;
             this.data = this.zeroValue;
             this.__needSetData = true;
           });
