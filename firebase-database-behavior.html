@@ -108,9 +108,9 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       __pathChanged: function(path, oldPath) {
+        this.exists = null;
         if (!this.disabled && !this.valueIsEmpty(this.data)) {
           this.syncToMemory(function() {
-            this.exists = null;
             this.data = this.zeroValue;
             this.__needSetData = true;
           });
