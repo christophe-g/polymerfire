@@ -148,6 +148,15 @@ Polymer({
           limitToLast: {
             type: Number,
             value: 0
+          },
+
+          /**
+           * `size` reflect data.length
+           */
+          size: {
+            type: Number,
+            notify: true,
+            readOnly: true
           }
         },
 
@@ -335,6 +344,7 @@ Polymer({
 
           this.__map[key] = value;
           this.splice('data', previousChildIndex + 1, 0, value);
+          this._setSize(this.data.length);
           this.exists = true;
         },
 
@@ -349,6 +359,7 @@ Polymer({
             this.async(function() {
               this.syncToMemory(function() {
                 this.splice('data', this.__indexFromKey(key), 1);
+                this._setSize(this.data.length);
                 if (this.data.length === 0) {
                   this.exists = false;
                 }
