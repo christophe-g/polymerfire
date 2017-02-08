@@ -186,10 +186,10 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
       if (value == null) {
         value = this.zeroValue;
+        this.__needSetData = true;
         exists = false;
       } else {
         exists = true;
-        this.__needSetData = true;
       }
 
       if (!this.isNew) {
@@ -204,7 +204,9 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
             // or if firebase value obj contain less keys than this.data (https://github.com/Polymer/polymer/issues/2565)
             if (this.__needSetData || !this.data || typeof value !== 'object' || ( Object.keys(value).length <  Object.keys(this.data).length)) {
               this.__needSetData = false;
-              return this.set('data', value);
+                this.set('data', value);
+                this.exists = exists;
+                return;
             }
 
             // now, we loop over keys
@@ -213,8 +215,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
                 this.set(['data', prop], value[prop]);
               }
             }
-            this._setStatusKnown(true);
-            this._setExists(exists);
+            this.exists = exists;
           });
         });
       }

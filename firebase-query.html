@@ -276,9 +276,23 @@ Polymer({
           return query;
         },
 
+        /**
+         * `@override`
+         */
+
+        __pathChanged: function(path, oldPath) {
+          // we only need to reset the data if the path is null (will also trigged when this element initiates)
+          // When path changes and is not null, it triggers a ref change (via __computeRef(db,path)), which then triggers a __queryChanged setting data to zeroValue
+
+          if (path == null ) {
+            this.syncToMemory(function() {
+              this.data = this.zeroValue;
+            });
+          }
+        },
+
         __queryChanged: function(query, oldQuery) {
           if (oldQuery) {
-            this._setStatusKnown(false);
             oldQuery.off('child_added', this.__onFirebaseChildAdded, this);
             oldQuery.off('child_removed', this.__onFirebaseChildRemoved, this);
             oldQuery.off('child_changed', this.__onFirebaseChildChanged, this);
@@ -286,10 +300,12 @@ Polymer({
 
             this.syncToMemory(function() {
               this.set('data', this.zeroValue);
+              this.exists = null;
             });
           }
 
           if (query) {
+            this.exists = false;
             query.on('child_added', this.__onFirebaseChildAdded, this.__onError, this);
             query.on('child_removed', this.__onFirebaseChildRemoved, this.__onError, this);
             query.on('child_changed', this.__onFirebaseChildChanged, this.__onError, this);
@@ -319,9 +335,7 @@ Polymer({
 
           this.__map[key] = value;
           this.splice('data', previousChildIndex + 1, 0, value);
-          this._setStatusKnown(true);
-          this._setExists(true);
-
+          this.exists = true;
         },
 
         __onFirebaseChildRemoved: function(snapshot) {
@@ -336,7 +350,7 @@ Polymer({
               this.syncToMemory(function() {
                 this.splice('data', this.__indexFromKey(key), 1);
                 if (this.data.length === 0) {
-                  this._setExists(false);
+                  this.exists = false;
                 }
               });
             });
