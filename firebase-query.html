@@ -360,10 +360,10 @@ Polymer({
               this.syncToMemory(function() {
                 this.splice('data', this.__indexFromKey(key), 1);
                 this.debounce('firebase-query-adjust-size', this.__adjustSize, 60);
-                if (this.data.length === 0) {
-                  this.exists = false;
-                }
               });
+              if (this.data.length === 0) {
+                this.exists = false;
+              }
             });
           }
         },
