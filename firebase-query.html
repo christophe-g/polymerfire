@@ -289,6 +289,7 @@ Polymer({
             this.syncToMemory(function() {
               this.__map = {};
               this.set('data', this.zeroValue);
+              this._setExists(null);
             });
           }
 
@@ -311,6 +312,8 @@ Polymer({
               * the callback if the query changes
               */
             query.on('value', this.__onFirebaseValue, this.__onError, this);
+            this._setExists(null);           
+
             query.on('child_added', this.__onFirebaseChildAdded, this.__onError, this);
             query.on('child_removed', this.__onFirebaseChildRemoved, this.__onError, this);
             query.on('child_changed', this.__onFirebaseChildChanged, this.__onError, this);
@@ -359,8 +362,10 @@ Polymer({
             value = this.__snapshotToValue(snapshot);
 
             this.__map[key] = value;
+            this._setExists(true);
             this.splice('data', previousChildIndex + 1, 0, value);
           }
+
         },
 
         __onFirebaseChildRemoved: function(snapshot) {
@@ -375,6 +380,10 @@ Polymer({
               this.syncToMemory(function() {
                 this.splice('data', this.__indexFromKey(key), 1);
               });
+              if (this.data.length === 0) {
+                this._setExists(false);
+                this.fire('empty-result');
+              }
             });
           }
         },
