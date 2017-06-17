@@ -148,6 +148,15 @@ Polymer({
           limitToLast: {
             type: Number,
             value: 0
+          },
+
+          /**
+           * `size` reflect data.length
+           */
+          size: {
+            type: Number,
+            notify: true,
+            readOnly: true
           }
         },
 
@@ -364,6 +373,7 @@ Polymer({
             this.__map[key] = value;
             this._setExists(true);
             this.splice('data', previousChildIndex + 1, 0, value);
+            this.debounce('firebase-query-adjust-size', this.__adjustSize, 60);
           }
 
         },
@@ -379,6 +389,7 @@ Polymer({
             this.async(function() {
               this.syncToMemory(function() {
                 this.splice('data', this.__indexFromKey(key), 1);
+                this.debounce('firebase-query-adjust-size', this.__adjustSize, 60);
               });
               if (this.data.length === 0) {
                 this._setExists(false);
@@ -458,8 +469,11 @@ Polymer({
         __snapshotToValue: function(snapshot) {
           var key = snapshot.key;
           var value = snapshot.val();
-
           return this.__valueWithKey(key, value);
+        },
+        
+         __adjustSize: function() {
+          this._setSize(this.data.length);
         }
       });
     })();
