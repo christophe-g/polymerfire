@@ -371,20 +371,21 @@ Polymer({
         __onFirebaseChildAdded: function(snapshot, previousChildKey) {
           var key = snapshot.key;
 
-          if (this.__initialLoadDone) {
-            var value = snapshot.val();
-            var previousChildIndex = this.__indexFromKey(previousChildKey);
+         // check if the key-value pair already exists
+          if (this.__indexFromKey(key) >= 0) return
 
-            this._log('Firebase child_added:', key, value);
+          var value = snapshot.val();
+          var previousChildIndex = this.__indexFromKey(previousChildKey);
 
-            value = this.__snapshotToValue(snapshot);
+          this._log('Firebase child_added:', key, value);
 
-            this.__map[key] = value;
-            this._setExists(true);
-            this.splice('data', previousChildIndex + 1, 0, value);
-            this.debounce('firebase-query-adjust-size', this.__adjustSize, 60);
-          }
+          value = this.__snapshotToValue(snapshot);
 
+          this.__map[key] = value;
+          this._setExists(true);
+          this.splice('data', previousChildIndex + 1, 0, value);
+          this.debounce('firebase-query-adjust-size', this.__adjustSize, 60);
+ 
         },
 
         __onFirebaseChildRemoved: function(snapshot) {
@@ -484,6 +485,7 @@ Polymer({
         __snapshotToValue: function(snapshot) {
           var key = snapshot.key;
           var value = snapshot.val();
+
           return this.__valueWithKey(key, value);
         },
         
